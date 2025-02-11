@@ -83,7 +83,3 @@ Este projeto está licenciado sob a Licença MIT. Consulte o arquivo [LICENSE](L
 ## Authors
 
 - [@minkyzecapagods](https://github.com/minkyzecapagods)
-   git push origin minha-feature
-   ```
-5. Abra um Pull Request para análise.
-
