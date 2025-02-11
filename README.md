@@ -80,6 +80,6 @@ Este é um projeto acadêmico, e contribuições para o aprimoramento do código
 
 Este projeto está licenciado sob a Licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## Authors
+## Autor
 
 - [@minkyzecapagods](https://github.com/minkyzecapagods)
