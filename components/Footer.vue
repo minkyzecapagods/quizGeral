@@ -5,7 +5,7 @@
         <p>&copy; 2024, minkyzecapagods.</p>
     </footer>
 </template>
-  
+
 <style>
     footer {
         text-align: center;

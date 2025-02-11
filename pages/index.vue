@@ -2,45 +2,47 @@
   <div>
     <div class="container">
       <Header />
-      
-      <div v-for="(item, index) in lista" id="separar">
-        <div id="caixa-pergunta" :class="index">
-          <h2 class="pergunta">{{ item.pergunta}}</h2>
-          <div id="alternativas">
+
+      <!-- Itera sobre cada questão da lista -->
+      <div v-for="(item, index) in lista" :key="index" class="separar">
+        <div class="caixa-pergunta" :class="{'desabilitado': desabilitar.includes(index)}">
+          <h2 class="pergunta">{{ item.pergunta }}</h2>
+          <div class="alternativas">
+            <!-- Itera diretamente sobre as alternativas do item -->
             <button
-            v-for="botao in lista[index].alternativas[0]"
-            v-on:click="contaQuestao(botao, index)"
-            v-bind:class="index"
-            v-bind:disabled="desabilitar.includes(index)"
-            >{{ botao }}</button>
+              v-for="(botao, bIndex) in item.alternativas"
+              :key="bIndex"
+              @click="contaQuestao(botao, index)"
+              :disabled="desabilitar.includes(index)"
+            >
+              {{ botao }}
+            </button>
           </div>
         </div>
       </div>
-      <!-- Essas divs tem as telas de vitória e derrota.
-        Acho que tem um jeito melhor pra isso, mas quero
-        entregar esse site hoje então depois melhoro. -->
-      <div id="caixa-pergunta" v-if="!estado">
-        <div id="final">
-          <img :src=source height="250px" />
-          <h1>{{mensagem}}</h1>
+
+      <!-- Tela de resultado: vitória ou derrota -->
+      <div class="caixa-pergunta" v-if="!estado">
+        <div class="final">
+          <img :src="source" alt="Resultado" height="250px" />
+          <h1>{{ mensagem }}</h1>
         </div>
-        <button v-on:click="resetarSite()">Jogar Novamente</button>
+        <button @click="resetarSite">Jogar Novamente</button>
       </div>
     </div>
-    <Footer/>
+    <Footer />
   </div>
 </template>
 
 <script>
 import Header from '../components/Header.vue';
-import Footer from '../components/Footer.vue'
+import Footer from '../components/Footer.vue';
 
 export default {
   components: {
     Header,
-    Footer
+    Footer,
   },
-
   data() {
     return {
       mensagem: '',
@@ -50,44 +52,52 @@ export default {
       erradas: 0,
       respondidas: 0,
       estado: true,
-      ganhou: false,
-      desabilitar: []
+      // 'ganhou' não está sendo usado; se não for necessário, pode ser removido.
+      desabilitar: [],
+      // Defina o número máximo de questões como propriedade para facilitar alterações
+      maxQuestoes: 10,
     };
   },
   methods: {
-    // Essa função basicamente verifica as questões respondidas, além de contar a quantidade de questões já
-    // feitas e a quantidade de acertos e erros. Console logs podem ser usados para testes.
-    contaQuestao(item, index) {
-      console.log(item, index)
-      if (item == this.lista[index].alternativaCorreta) {
-        console.log('Acertou!'); // Mostra que está certo.
+    /**
+     * Verifica se a resposta selecionada está correta e atualiza os contadores.
+     * @param {String} resposta - A alternativa selecionada pelo usuário.
+     * @param {Number} index - O índice da questão atual.
+     */
+    contaQuestao(resposta, index) {
+      console.log('Resposta selecionada:', resposta, 'na questão:', index);
+      if (resposta === this.lista[index].alternativaCorreta) {
+        console.log('Acertou!');
         this.corretas += 1;
       } else {
-        console.log('Errou!'); // Mostra que está errado.
+        console.log('Errou!');
         this.erradas += 1;
       }
       this.respondidas += 1;
 
-      if (this.respondidas > 9) {
+      // Se todas as questões foram respondidas, define a mensagem de resultado
+      if (this.respondidas >= this.maxQuestoes) {
         if (this.corretas >= this.erradas) {
-          this.mensagem = 'Você ganhou! Questões certas: ' + this.corretas;
+          this.mensagem = `Você ganhou! Questões certas: ${this.corretas}`;
           this.source = '/sonicganha.png';
-        }
-        else {
-          this.mensagem =  'Você perdeu... Questões erradas: ' + this.erradas;
+        } else {
+          this.mensagem = `Você perdeu... Questões erradas: ${this.erradas}`;
           this.source = '/sonicperde.png';
         }
-        
         this.estado = false;
       }
 
-      this.desabilitar.push(index)
+      // Desabilita a questão para evitar múltiplas respostas
+      this.desabilitar.push(index);
 
-      console.log('Acertos:', this.corretas); // Mostra quantidade de acertos.
-      console.log('Erros:', this.erradas); // Mostra quantidade de erros.
-      console.log('Respondidas:', this.respondidas); // Mostra questões feitas.
+      console.log('Acertos:', this.corretas);
+      console.log('Erros:', this.erradas);
+      console.log('Respondidas:', this.respondidas);
     },
 
+    /**
+     * Reinicia o jogo, limpando os dados e carregando novas questões.
+     */
     resetarSite() {
       this.lista = [];
       this.desabilitar = [];
@@ -95,17 +105,18 @@ export default {
       this.erradas = 0;
       this.respondidas = 0;
       this.estado = true;
-      this.ganhou = false;
       this.selecionaQuestao();
     },
 
+    /**
+     * Realiza uma requisição para obter as questões e formata os dados.
+     */
     async selecionaQuestao() {
       try {
         const response = await this.$axios.get(
           'https://the-trivia-api.com/v2/questions/'
         );
-        // console.log(response.data);
-        // Função shuffle.
+        // Função para embaralhar as alternativas
         function shuffle(array) {
           for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -113,23 +124,23 @@ export default {
           }
           return array;
         }
-         let tentativa = [];
 
         response.data.forEach((element) => {
-          let alternativas = [];
-          let pergunta = element.question.text;
-          tentativa = element.incorrectAnswers;
-          tentativa.push(element.correctAnswer);
-          alternativas.push(shuffle(tentativa));
-          let correta = element.correctAnswer;
-          this.lista.push({pergunta: pergunta, alternativas, alternativaCorreta: correta});
-          tentativa = [];
+          // Constrói um array de alternativas já embaralhado
+          const alternativas = shuffle([
+            ...element.incorrectAnswers,
+            element.correctAnswer,
+          ]);
+          // Adiciona a questão à lista
+          this.lista.push({
+            pergunta: element.question.text,
+            alternativas,
+            alternativaCorreta: element.correctAnswer,
+          });
         });
-        console.log(this.lista[0].alternativas)
-      } 
-      catch (error) {
-        console.error(error);
-        this.posts = [];
+        console.log('Primeira questão alternativas:', this.lista[0].alternativas);
+      } catch (error) {
+        console.error('Erro ao carregar questões:', error);
       }
     },
   },
@@ -139,7 +150,8 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+
 .container {
   margin: 0 auto;
   min-height: 100vh;
@@ -157,7 +169,8 @@ export default {
   margin-bottom: 10%;
 }
 
-#separar {
+/* Classes para separar questões e caixa de pergunta */
+.separar {
   display: flex;
   justify-content: center;
   flex-direction: column;
@@ -167,12 +180,9 @@ export default {
   width: 100%;
 }
 
-#caixa-pergunta {
+.caixa-pergunta {
   background-color: #f3f5f7;
-  padding-top: 5%;
-  padding-bottom: 5%;
-  padding-left: 5%;
-  padding-right: 5%;
+  padding: 5% 5%;
   margin-bottom: 50px;
   min-height: 60vh;
   width: 60%;
@@ -183,17 +193,18 @@ export default {
   flex-direction: column;
 }
 
-#alternativas {
+/* Estilização para alternativas */
+.alternativas {
   display: flex;
   flex-direction: column;
 }
 
+/* Estilização para a tela de resultado */
 .final {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   margin-bottom: 50px;
-  
 }
 
 button {
@@ -203,4 +214,11 @@ button {
   transition: all 0.15s;
   font-weight: bold;
 }
+
+/* Estilização para indicar elemento desabilitado */
+.desabilitado {
+  pointer-events: none;
+  opacity: 0.9;
+}
 </style>
+

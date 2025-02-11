@@ -24,6 +24,7 @@
   align-self: center;
   cursor: pointer;
   transition: all 0.5s;
+  z-index: 1000;
 }
 
 #cabecalho:hover {
