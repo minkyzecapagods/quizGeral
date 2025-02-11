@@ -11,10 +11,10 @@ O "Quiz do Ouriço" é uma aplicação web que desafia o usuário com perguntas 
 ## Objetivos do Projeto
 
 - Aplicar os conhecimentos adquiridos durante o minicurso, incluindo:
-  - Estruturação de projetos com o framework Nuxt.js;
-  - Consumo de APIs para obtenção de dados dinâmicos;
-  - Gerenciamento de estado com Vue;
-  - Estilização de componentes utilizando CSS3.
+  - **Consumo de API** para carregar perguntas dinamicamente.
+  - **Componentização com Vue.js** para melhor organização do código.
+  - **Uso do framework Nuxt.js** para otimizar a experiência e facilitar o desenvolvimento.
+  - **Gerenciamento de estado** e **interatividade com o usuário**.
 
 ## Tecnologias Utilizadas
 
@@ -23,8 +23,6 @@ O "Quiz do Ouriço" é uma aplicação web que desafia o usuário com perguntas 
 - **HTML5**: Linguagem de marcação padrão para criação de páginas web.
 - **CSS3**: Folhas de estilo em cascata para estilização e layout das páginas.
 - **JavaScript**: Linguagem de programação que permite a implementação de funcionalidades interativas em páginas web.
-
-
 
 ## Requisitos
 
